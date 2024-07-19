@@ -1,0 +1,30 @@
+{
+  "name": "pretendolookup",
+  "version": "0.1.0",
+  "description": "Parses information from Juxt and lets you search for information",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Milk-Cool/PretendoLookup.git"
+  },
+  "keywords": [
+    "juxtaposition",
+    "juxt",
+    "pretendo",
+    "search",
+    "lookup"
+  ],
+  "author": "Milk_Cool",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Milk-Cool/PretendoLookup/issues"
+  },
+  "homepage": "https://github.com/Milk-Cool/PretendoLookup#readme",
+  "dependencies": {
+    "puppeteer": "^22.13.1"
+  }
+}
