@@ -50,7 +50,8 @@ db.run(`CREATE TABLE IF NOT EXISTS replies (
  * @param {string?} imagehash The JIMP image hash
  */
 export function pushPost(id, pid, community, contents, yeahs, replies, image = "", imagehash = "") {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
+        if(await getPostByID(id)) return resolve(null);
         db.run(`INSERT INTO posts (id, pid, community, contents, yeahs, replies, image, imagehash)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, [id, pid, community, contents, yeahs, replies, image, imagehash], resolve);
     });
@@ -83,8 +84,9 @@ export function getPostByID(id) {
  * @param {string?} imagehash The JIMP image hash
  */
 export function pushReply(id, pid, parent, contents, yeahs, image = "", imagehash = "") {
-    return new Promise(resolve => {
-        db.run(`INSERT INTO posts (id, pid, parent, contents, yeahs, image, imagehash)
+    return new Promise(async resolve => {
+        if(await getReplyByID(id)) return resolve(null);
+        db.run(`INSERT INTO replies (id, pid, parent, contents, yeahs, image, imagehash)
             VALUES (?, ?, ?, ?, ?, ?, ?);`, [id, pid, parent, contents, yeahs, image, imagehash], resolve);
     });
 }
@@ -116,6 +118,20 @@ export function pushCommunity(id, name, firstscanamount, lastid = "") {
     return new Promise(resolve => {
         db.run(`INSERT INTO communities (id, name, firstscanamount, lastid)
             VALUES (?, ?, ?, ?);`, [id, name, firstscanamount, lastid], resolve);
+    });
+}
+
+/**
+ * Updates the last checked post in the database for this community.
+ * 
+ * @param {string} id The community ID
+ * @param {string} lastid The new last post ID
+ */
+export function updateCommunityLastID(id, lastid) {
+    return new Promise(resolve => {
+        db.run(`UPDATE communities
+            SET lastid = ?
+            WHERE id = ?;`, [lastid, id], resolve);
     });
 }
 

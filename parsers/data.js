@@ -4,7 +4,7 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
 export class HTMLBrowser {
     constructor() {
-        this.browserAsync = puppeteer.use(StealthPlugin()).launch({ "headless": false });
+        this.browserAsync = puppeteer.use(StealthPlugin()).launch();
     }
 
     /**
@@ -15,15 +15,19 @@ export class HTMLBrowser {
     async make() {
         this.browser = await this.browserAsync;
         this.page = await this.browser.newPage();
+        // Page 2 is used for thread checking
+        this.page2 = await this.browser.newPage();
 
         // https://stackoverflow.com/a/70137587/13046254
-        await this.page.setRequestInterception(true);
-        this.page.on("request", req => {
-            if (!["document", "xhr", "fetch", "script"].includes(req.resourceType())) {
-                return req.abort();
-            }
-            req.continue();
-        });
+        for(const p of ["page", "page2"]) {
+            await this[p].setRequestInterception(true);
+            this[p].on("request", req => {
+                if (!["document", "xhr", "fetch", "script"].includes(req.resourceType())) {
+                    return req.abort();
+                }
+                req.continue();
+            });
+        }
     }
 
     /**
@@ -40,12 +44,14 @@ export class HTMLBrowser {
  * 
  * @param {HTMLBrowser} browser The browser to use
  * @param {string} path The page path
+ * @param {string} page The page to use, "page" by default
  * @returns {Buffer} Binary data
  */
-export async function get(browser, path) {
+export async function get(browser, path, page = "page") {
     const url = genUrl(path);
 
-    await browser.page.goto(url);
-    await browser.page.waitForFunction(() => document.readyState === "complete");
-    return await browser.page.content();
+    await browser[page].bringToFront();
+    await browser[page].goto(url);
+    await browser[page].waitForFunction(() => document.readyState === "complete");
+    return await browser[page].content();
 }
