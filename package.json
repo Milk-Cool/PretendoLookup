@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/Milk-Cool/PretendoLookup#readme",
   "dependencies": {
+    "jimp": "^0.22.12",
     "jsdom": "^24.1.0",
     "puppeteer": "^22.13.1",
     "puppeteer-extra": "^3.3.6",
