@@ -9,10 +9,25 @@ import {
     pushCommunity,
     pushPost,
     pushReply,
-    updateCommunityLastID
+    updateCommunityLastID,
+    getUserData,
+    pushUser,
+    getUserByID
 } from "./index.js";
 
 const SERVICE = "Worker";
+
+/**
+ * Scans a user.
+ * @param {HTMLBrowser} browser The browser to use
+ * @param {number} pid The user's PID
+ */
+const scanUser = async (browser, pid) => {
+    await getUserData(browser, pid, async user => {
+        await pushUser(pid, user.pnid, user.name, user.miihash);
+        dlog(SERVICE, `Pushed user ${user.pnid} to the database!`);
+    });
+};
 
 /**
  * Scans a community's posts.
@@ -29,10 +44,14 @@ const scanCommunity = async (browser, community) => {
             await pushReply(reply.id, reply.pid, reply.parent, reply.contents,
                 reply.yeahs, reply.image, reply.imagehash);
             dlog(SERVICE, `Pushed reply ${reply.id} to the database!`);
+            if(!(await getUserByID(reply.pid)))
+                await scanUser(browser, reply.pid);
         });
         await pushPost(post.id, post.pid, community.id, post.contents,
             post.yeahs, post.replies, post.image, post.imagehash);
         dlog(SERVICE, `Pushed post ${post.id} to the database!`);
+        if(!(await getUserByID(post.pid)))
+            await scanUser(browser, post.pid);
     }, id => {
         if(last == "") last = id;
     });

@@ -14,12 +14,15 @@ export class HTMLBrowser {
      */
     async make() {
         this.browser = await this.browserAsync;
+        // Page 1 is used for communities and post checking
         this.page = await this.browser.newPage();
         // Page 2 is used for thread checking
         this.page2 = await this.browser.newPage();
+        // Page 3 is used for user checking
+        this.page3 = await this.browser.newPage();
 
         // https://stackoverflow.com/a/70137587/13046254
-        for(const p of ["page", "page2"]) {
+        for(const p of ["page", "page2", "page3"]) {
             await this[p].setRequestInterception(true);
             this[p].on("request", req => {
                 if (!["document", "xhr", "fetch", "script"].includes(req.resourceType())) {

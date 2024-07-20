@@ -20,11 +20,12 @@ db.run(`CREATE TABLE IF NOT EXISTS posts (
     image TEXT,
     imagehash TEXT
 );`);
-/** @typedef {{pid: number, pnid: string, name: string }} User */
+/** @typedef {{pid: number, pnid: string, name: string, miihash: string }} User */
 db.run(`CREATE TABLE IF NOT EXISTS users (
     pid INTEGER,
     pnid TEXT,
-    name TEXT
+    name TEXT,
+    miihash TEXT
 );`);
 /** @typedef {{id: string, pid: number, parent: string, contents: string, yeahs: number, image: string, imagehash: string }} Reply */
 db.run(`CREATE TABLE IF NOT EXISTS replies (
@@ -156,11 +157,12 @@ export function getCommunityByID(id) {
  * @param {number} pid The user PID
  * @param {string} pnid The user PNID
  * @param {string} name The user's name
+ * @param {string} miihash The user's Mii JIMP hash
  */
-export function pushUser(pid, pnid, name) {
+export function pushUser(pid, pnid, name, miihash) {
     return new Promise(resolve => {
-        db.run(`INSERT INTO users (pid, pnid, name)
-            VALUES (?, ?, ?);`, [pid, pnid, name], resolve);
+        db.run(`INSERT INTO users (pid, pnid, name, miihash)
+            VALUES (?, ?, ?, ?);`, [pid, pnid, name, miihash], resolve);
     });
 }
 
