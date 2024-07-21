@@ -108,6 +108,76 @@ export function getReplyByID(id) {
 }
 
 /**
+ * Retrieves posts and replies from the database by its author PID.
+ * 
+ * @param {number} pid The author PID
+ * @returns {Post | Reply} The content data
+ */
+export function getContentByPID(pid) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts WHERE pid = ? LIMIT 50;`, [pid], (err, data) => {
+            if(err) reject(err);
+            db.all(`SELECT * FROM replies WHERE pid = ? LIMIT 50;`, [pid], (err2, data2) => {
+                if(err2) reject(err);
+                resolve(data.concat(data2));
+            });
+        });
+    });
+}
+
+/**
+ * Retrieves posts and replies from the database by its community PID.
+ * TODO: also return replies
+ * 
+ * @param {string} id The community ID
+ * @returns {Post | Reply} The content data
+ */
+export function getContentByCommunity(id) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts WHERE community = ? LIMIT 50;`, [id], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Retrieves posts and replies from the database by a keyword.
+ * 
+ * @param {string} keyword The keyword
+ * @returns {Post | Reply} The content data
+ */
+export function getContentByKeyword(keyword) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts WHERE instr(lower(contents), lower(?)) LIMIT 50;`, [keyword], (err, data) => {
+            if(err) reject(err);
+            db.all(`SELECT * FROM replies WHERE instr(lower(contents), lower(?)) LIMIT 50;`, [keyword], (err2, data2) => {
+                if(err2) reject(err);
+                resolve(data.concat(data2));
+            });
+        });
+    });
+}
+
+/**
+ * Retrieves posts and replies from the database by a keyword.
+ * 
+ * @param {string} imghash The keyword
+ * @returns {Post | Reply} The content data
+ */
+export function getContentByImageHash(imghash) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts WHERE imagehash = ? LIMIT 50;`, [imghash], (err, data) => {
+            if(err) reject(err);
+            db.all(`SELECT * FROM replies WHERE imagehash = ? LIMIT 50;`, [imghash], (err2, data2) => {
+                if(err2) reject(err);
+                resolve(data.concat(data2));
+            });
+        });
+    });
+}
+
+/**
  * Pushes a community to the database.
  * 
  * @param {string} id The community ID
@@ -175,6 +245,54 @@ export function pushUser(pid, pnid, name, miihash) {
 export function getUserByID(pid) {
     return new Promise((resolve, reject) => {
         db.get(`SELECT * FROM users WHERE pid = ?;`, [pid], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Retrieves all users from the database containing the string in their PNID.
+ * 
+ * @param {string} pnid The user PNID
+ * @returns {User} The user data
+ */
+export function getUserByPNID(pnid) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM users WHERE instr(lower(pnid), lower(?)) > 0
+            ORDER BY length(pnid) LIMIT 50;`, [pnid], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Retrieves all users from the database containing the string in their name.
+ * 
+ * @param {string} name The user name
+ * @returns {User} The user data
+ */
+export function getUserByName(name) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM users WHERE instr(lower(name), lower(?)) > 0
+            ORDER BY length(name) LIMIT 50;`, [name], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Retrieves all users from the database matching a Mii hash.
+ * 
+ * @param {string} hash The hash
+ * @returns {User} The user data
+ */
+export function getUserByMiiHash(hash) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM users WHERE miihash = ?
+        LIMIT 250;`, [hash], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });

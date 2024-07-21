@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PretendoLookup | Post search</title>
+        <meta charset="utf-8">
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <iframe src="toppanel.html" class="panel-top-iframe no-border"></iframe>
+        <div class="block search-form">
+            <h1>Search users</h1>
+            <form action="/resultsposts" method="get">
+                <input hidden name="type" value="id">
+                <input name="query" placeholder="Post ID">
+                <input type="submit">
+            </form>
+            <hr color="#383f6b">
+            <form action="/resultsposts" method="get">
+                <input hidden name="type" value="pid">
+                <input name="query" placeholder="User PID">
+                <input type="submit">
+            </form>
+            <hr color="#383f6b">
+            <form action="/resultsposts" method="get">
+                <input hidden name="type" value="community">
+                <input name="query" placeholder="Community ID">
+                <input type="submit">
+            </form>
+            <hr color="#383f6b">
+            <form action="/resultsposts" method="get">
+                <input hidden name="type" value="keyword">
+                <input name="query" placeholder="Keyword">
+                <input type="submit">
+            </form>
+            <hr color="#383f6b">
+            <form action="/resultsposts" method="get">
+                <input hidden name="type" value="hash">
+                <input name="query" placeholder="Image JIMP hash (normal)">
+                <input type="submit">
+            </form>
+        </div>
+    </body>
+</html>

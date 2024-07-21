@@ -1,0 +1,93 @@
+* {
+    font: sans-serif;
+    color: white;
+}
+
+:root {
+    --pad: 1em;
+    --pad-outer: 1em;
+}
+
+body {
+    background: #1B1F3B;
+    margin: 0;
+}
+
+.block {
+    background: #2a2f50;
+    border-radius: 1em;
+    padding: var(--pad);
+}
+
+.gray {
+    color: gray;
+}
+
+.ilb {
+    display: inline-block;
+}
+
+/* Panels */
+.no-border {
+    border: none;
+}
+.panel-top-iframe {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+}
+.panel-top {
+    position: fixed;
+    top: var(--pad-outer);
+    left: var(--pad-outer);
+    height: 4em;
+    width: calc(100vw - 2 * var(--pad) - 2 * var(--pad-outer));
+}
+.panel-top > .text-panel-top {
+    display: inline-block;
+}
+.right {
+    float: right;
+}
+.search-form {
+    position: fixed;
+    top: 50vh;
+    left: 50vw;
+    max-height: 80vh;
+    transform: translate(-50%, -50%);
+}
+.main {
+    position: fixed;
+    top: calc(4em + 2 * var(--pad-outer) + 2 * var(--pad));
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 4em - 2 * var(--pad-outer) - 2 * var(--pad));
+    overflow: auto;
+}
+.result {
+    width: min-content;
+    height: min-content;
+    display: inline-block;
+    margin: 1em;
+}
+.result > img {
+    max-width: 25em;
+}
+
+/* Buttons */
+input[type="submit"], button {
+    background: #383f6b;
+    border: none;
+    border-radius: 1em;
+    padding: 1em;
+}
+input:not([type="submit"]) {
+    background: #353C6A;
+    border: none;
+    border-radius: 1em;
+    padding: 1em;
+}
+input::placeholder {
+    color: gray;
+}

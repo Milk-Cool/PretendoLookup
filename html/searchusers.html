@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PretendoLookup | User search</title>
+        <meta charset="utf-8">
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <iframe src="toppanel.html" class="panel-top-iframe no-border"></iframe>
+        <div class="block search-form">
+            <h1>Search users</h1>
+            <form action="/resultsusers" method="get">
+                <input hidden name="type" value="pid">
+                <input name="query" placeholder="PID">
+                <input type="submit">
+            </form>
+            <hr color="#383f6b">
+            <form action="/resultsusers" method="get">
+                <input hidden name="type" value="pnid">
+                <input name="query" placeholder="PNID">
+                <input type="submit">
+            </form>
+            <hr color="#383f6b">
+            <form action="/resultsusers" method="get">
+                <input hidden name="type" value="name">
+                <input name="query" placeholder="Username">
+                <input type="submit">
+            </form>
+            <hr color="#383f6b">
+            <form action="/resultsusers" method="get">
+                <input hidden name="type" value="hash">
+                <input name="query" placeholder="Mii JIMP hash (normal)">
+                <input type="submit">
+            </form>
+        </div>
+    </body>
+</html>
