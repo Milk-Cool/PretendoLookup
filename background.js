@@ -78,9 +78,10 @@ const scanCommunity = async (browser, community) => {
         }
     }
 
-    for(const community of communities) {
-        const data = await getCommunityByID(community.id);
-        await scanCommunity(browser, data);
+    while(true) {
+        for(const community of communities) {
+            const data = await getCommunityByID(community.id);
+            await scanCommunity(browser, data);
+        }
     }
-    dlog("Done!");
 } catch(e) { log(SERVICE, `Critical error! ${e}\n${e.stack}`, "error") } })();
