@@ -81,6 +81,7 @@ input[type="submit"], button {
     border: none;
     border-radius: 1em;
     padding: 1em;
+    cursor: pointer;
 }
 input:not([type="submit"]) {
     background: #353C6A;
