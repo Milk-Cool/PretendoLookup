@@ -22,7 +22,9 @@ export async function getPosts(browser, community, lastPost, cb, idcb) {
     while(true) {
         let content;
         try {
-            content = await get(browser, `/titles/${community}/new/more?offset=${offset}`);
+            const page = await browser.createPage();
+            content = await get(page, `/titles/${community}/new/more?offset=${offset}`);
+            await page.close();
         } catch(_) {
             // 204
             break;
@@ -78,7 +80,9 @@ export async function getPosts(browser, community, lastPost, cb, idcb) {
  * @param {(import("../storage.js").Reply) => void} cb The callback used for saving replies
  */
 export async function getReplies(browser, id, cb) {
-    const content = await get(browser, `/posts/${id}`, "page2");
+    const page = await browser.createPage();
+    const content = await get(page, `/posts/${id}`);
+    await page.close();
     const dom = new JSDOM(content, { "contentType": "text/html" });
     const { document } = dom.window;
 

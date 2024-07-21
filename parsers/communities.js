@@ -8,7 +8,9 @@ import { JSDOM } from "jsdom";
  * @param {(import("../storage.js").Community) => void} cb The callback used for storing and scanning the communities.
  */
 export async function getCommunities(browser, cb) {
-    const content = await get(browser, `/titles/all`);
+    const page = await browser.createPage();
+    const content = await get(page, `/titles/all`);
+    await page.close();
     const dom = new JSDOM(content, { "contentType": "text/html" });
     const { document } = dom.window;
 

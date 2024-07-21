@@ -1,3 +1,4 @@
+import { Page } from "puppeteer";
 import genUrl from "./url.js";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
@@ -14,23 +15,24 @@ export class HTMLBrowser {
      */
     async make() {
         this.browser = await this.browserAsync;
-        // Page 1 is used for communities and post checking
-        this.page = await this.browser.newPage();
-        // Page 2 is used for thread checking
-        this.page2 = await this.browser.newPage();
-        // Page 3 is used for user checking
-        this.page3 = await this.browser.newPage();
+        return this;
+    }
 
-        // https://stackoverflow.com/a/70137587/13046254
-        for(const p of ["page", "page2", "page3"]) {
-            await this[p].setRequestInterception(true);
-            this[p].on("request", req => {
-                if (!["document", "xhr", "fetch", "script"].includes(req.resourceType())) {
-                    return req.abort();
-                }
-                req.continue();
-            });
-        }
+    /**
+     * Creates a page.
+     * 
+     * @returns {Page} The created page
+     */
+    async createPage() {
+        const page = await this.browser.newPage();
+        await page.setRequestInterception(true);
+        page.on("request", req => {
+            if (!["document", "xhr", "fetch", "script"].includes(req.resourceType())) {
+                return req.abort();
+            }
+            req.continue();
+        });
+        return page;
     }
 
     /**
@@ -45,16 +47,15 @@ export class HTMLBrowser {
 /**
  * GETs data
  * 
- * @param {HTMLBrowser} browser The browser to use
+ * @param {Page} page The page to use
  * @param {string} path The page path
- * @param {string} page The page to use, "page" by default
  * @returns {Buffer} Binary data
  */
-export async function get(browser, path, page = "page") {
+export async function get(page, path) {
     const url = genUrl(path);
 
-    await browser[page].bringToFront();
-    await browser[page].goto(url);
-    await browser[page].waitForFunction(() => document.readyState === "complete");
-    return await browser[page].content();
+    await page.bringToFront();
+    await page.goto(url);
+    await page.waitForFunction(() => document.readyState === "complete");
+    return await page.content();
 }

@@ -13,7 +13,9 @@ const SERVICE = "USERS";
  * @param {(import("../storage.js").Post) => void} cb The callback used for saving user data
  */
 export async function getUserData(browser, id, cb) {
-    const content = await get(browser, `/users/${id}`, "page3");
+    const page = await browser.createPage();
+    const content = await get(page, `/users/${id}`);
+    await page.close();
     const dom = new JSDOM(content, { "contentType": "text/html" });
     const { document } = dom.window;
     
