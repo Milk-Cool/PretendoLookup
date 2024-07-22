@@ -33,7 +33,7 @@ const s = text => text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 const app = express();
 app.use(fileUpload({ "limits": { "fileSize": 10 * 1024 * 1024 } }));
 
-const renderPost = (document, out, replace = "{{RESULTS") => {
+const renderPost = (document, out, replace = "{{RESULTS}}") => {
     return document.replaceAll(replace, out.map(x => {
         if(!x) return "";
         return `<div class="block result">
