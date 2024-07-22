@@ -7,6 +7,7 @@ import Jimp from "jimp";
 import {
     log,
     genUrl,
+    fetchMiiData,
     getUserByID,
     getUserByName,
     getUserByPNID,
@@ -61,11 +62,27 @@ app.get("/user/:id", async (req, res) => {
 
     const user = await getUserByID(req.params.id);
     if(!user) return res.status(404).end("not found!");
+    const mii = await fetchMiiData(req.params.id);
     document = document.replaceAll("{{USER}}", `
         <img src="https://pretendo-cdn.b-cdn.net/mii/${user.pid}/normal_face.png">
         <h1>${user.name} @${user.pnid}</h1>
         <h2><a href="${genUrl("/users/" + user.pid)}" target="_blank">View on Juxt</a></h2>
         <h2><a href="/resultsposts?type=pid&query=${user.pid}">View posts</a></h2>
+        ${mii.error ? "" : `
+            <h3>Mii info:</h3>
+            <ul>
+            <li>${mii.version == 3 ? "Made from scratch" : "Made from a photo"}</li>
+            <li>Made on ${["Wii", "DS", "3DS", "Wii U"][mii.deviceOrigin - 1]}</li>
+            <li>Console ID: ${mii.systemId.toString("hex")}</li>
+            <li>Console MAC: ${mii.consoleMAC.toString("hex")}</li>
+            <li>Is special: ${!mii.normalMii ? "Yes" : "No"}</li>
+            <li>Is favorite: ${mii.favorite ? "Yes" : "No"}</li>
+            <li>Creator name: ${mii.creatorName}</li>
+            <li>Creation time: ${(new Date(Number(new Date("2010-01-01T00:00:00.000+00:00")) + mii.creationTime * 2000)).toGMTString()}</li>
+            <li>Gender: ${mii.gender ? "Girl" : "Boy"}</li>
+            <li>Birthday: ${mii.birthMonth}/${mii.birthDay}</li>
+            </ul>
+        `}
     `);
     res.status(200).end(document);
 });

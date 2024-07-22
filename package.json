@@ -4,6 +4,7 @@
   "description": "Parses information from Juxt and lets you search for information",
   "main": "index.js",
   "scripts": {
+    "postinstall": "cd node_modules/@pretendonetwork/mii-js && npm i --include=dev && npx tsc && npx tsc-alias && npm run copy-files && cd ../../..",
     "start": "node server.js",
     "test": "DEBUG=1 node server.js",
     "getamount": "node tools/amount.js"
@@ -27,8 +28,10 @@
   },
   "homepage": "https://github.com/Milk-Cool/PretendoLookup#readme",
   "dependencies": {
+    "@pretendonetwork/mii-js": "github:PretendoNetwork/mii-js",
     "express": "^4.19.2",
     "express-fileupload": "^1.5.1",
+    "fast-xml-parser": "^4.4.0",
     "jimp": "^0.22.12",
     "jsdom": "^24.1.0",
     "puppeteer": "^22.13.1",
