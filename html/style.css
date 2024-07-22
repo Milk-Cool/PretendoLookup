@@ -70,8 +70,12 @@ body {
     height: min-content;
     display: inline-block;
     margin: 1em;
+    min-width: 30em;
 }
-.result > img {
+.result > .img-container {
+    text-align: center;
+}
+.result > .img-container > img {
     max-width: 25em;
 }
 
@@ -92,4 +96,8 @@ input:not([type="submit"]) {
 }
 input::placeholder {
     color: gray;
+}
+
+.c {
+    text-align: center;
 }

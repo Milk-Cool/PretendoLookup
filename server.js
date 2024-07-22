@@ -39,7 +39,7 @@ const renderPost = (document, out, replace = "{{RESULTS") => {
         return `<div class="block result">
             <h3><a href="/${typeof x.replies !== "undefined" ? "post" : "reply"}/${x.id}">${s(x.contents) || "Post"}</a></h3>
             <h5><a href="/user/${x.pid}">${x.pid}</a></h5>
-            ${x.image ? `<img src="${x.image}">` : ""}
+            ${x.image ? `<div class="img-container"><img src="${x.image}"></div>` : ""}
             <h6>${typeof x.replies !== "undefined" ? `<a href="/resultsposts?type=parent&query=${x.id}">${x.replies + " replies"}</a>` : ""}</h6>
             <h6>${x.yeahs} yeahs</h6>
         </div>`
