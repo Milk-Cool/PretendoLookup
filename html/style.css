@@ -75,6 +75,7 @@ body {
     display: inline-block;
     margin: var(--pad-outer);
     flex: 1 auto;
+    max-width: 35em;
 }
 @media only screen and (max-width: 768px) {
     .result {
