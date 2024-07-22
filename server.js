@@ -111,6 +111,27 @@ app.get("/post/:id", async (req, res) => {
     res.status(200).end(document);
 });
 
+app.get("/reply/:id", async (req, res) => {
+    if(!req.params.id) return res.status(400).end("de-un-bad request");
+
+    let document = fs.readFileSync("html/reply.html", "utf-8");
+
+    const reply = await getReplyByID(req.params.id);
+    if(!reply) return res.status(404).end("not found unofrtunately :(");
+    document = document.replaceAll("{{REPLY}}", `
+        <h2>${s(reply.contents) || "Post"}</h2>
+        <h3>By ${reply.pid}</h3>
+        ${reply.image ? `<img src="${reply.image}" width="600">` : "No image"}<br>
+        <i>${reply.imagehash}</i><br>
+        <h4>${reply.yeahs} yeahs</h4>
+
+        <h2><a href="/post/${reply.parent}">View parent post</a></h2>
+        <h2><a href="${genUrl("/posts/" + reply.id)}" target="_blank">View on Juxt</a></h2>
+        <h2><a href="${genUrl("/users/" + reply.pid)}" target="_blank">View user on Juxt</a></h2>
+    `);
+    res.status(200).end(document);
+});
+
 app.get("/resultsusers", async (req, res) => {
     if(req.query.query == "") return res.status(400).end("bad request!");
 
