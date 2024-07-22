@@ -1,5 +1,5 @@
 import { Page } from "puppeteer";
-import genUrl from "./url.js";
+import { genUrl } from "./url.js";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 

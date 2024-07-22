@@ -50,7 +50,7 @@ body {
 .right {
     float: right;
 }
-.search-form {
+.search-form, .user-data {
     position: fixed;
     top: 50vh;
     left: 50vw;

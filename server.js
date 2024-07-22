@@ -6,6 +6,7 @@ import Jimp from "jimp";
 
 import {
     log,
+    genUrl,
     getUserByID,
     getUserByName,
     getUserByPNID,
@@ -17,7 +18,7 @@ import {
     getContentByKeyword,
     getContentByPID,
     getContentAll,
-    getUserAll
+    getUserAll,
 } from "./index.js";
 
 const SERVICE = "Server";
@@ -31,6 +32,7 @@ app.use(express.static("html"));
 
 const renderPost = (document, out) => {
     return document.replaceAll("{{RESULTS}}", out.map(x => {
+        if(!x) return "";
         return `<div class="block result">
             <h3><a href="/${typeof x.replies !== "undefined" ? "post" : "reply"}/${x.id}">${x.contents}</a></h3>
             <h5><a href="/user/${x.pid}">${x.pid}</a></h5>
@@ -43,12 +45,29 @@ const renderPost = (document, out) => {
 
 const renderUser = (document, out) => {
     return document.replaceAll("{{RESULTS}}", out.map(x => {
+        if(!x) return "";
         return `<div class="block result">
             <img src="https://pretendo-cdn.b-cdn.net/mii/${x.pid}/normal_face.png"><br>
             <h2><a href="/user/${x.pid}">${x.name} @${x.pnid}</a></h2>
         </div>`
     }).join(""));
 }
+
+app.get("/user/:id", async (req, res) => {
+    if(!req.params.id) return res.status(400).end("bad-der request");
+
+    let document = fs.readFileSync("html/user.html", "utf-8");
+
+    const user = await getUserByID(req.params.id);
+    if(!user) return res.status(404).end("not found!");
+    document = document.replaceAll("{{USER}}", `
+        <img src="https://pretendo-cdn.b-cdn.net/mii/${user.pid}/normal_face.png">
+        <h1>${user.name} @${user.pnid}</h1>
+        <h2><a href="${genUrl("/users/" + user.pid)}" target="_blank">View on Juxt</a></h2>
+        <h2><a href="/resultsposts?type=pid&query=${user.pid}">View posts</a></h2>
+    `);
+    res.status(200).end(document);
+});
 
 app.get("/resultsusers", async (req, res) => {
     if(req.query.query == "") return res.status(400).end("bad request!");
