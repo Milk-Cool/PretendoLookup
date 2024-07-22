@@ -95,12 +95,27 @@ export function pushReply(id, pid, parent, contents, yeahs, image = "", imagehas
 /**
  * Retrieves a reply from the database by its ID.
  * 
- * @param {string} id The post ID
- * @returns {Post} The post data
+ * @param {string} id The reply ID
+ * @returns {Reply} The reply data
  */
 export function getReplyByID(id) {
     return new Promise((resolve, reject) => {
         db.get(`SELECT * FROM replies WHERE id = ?;`, [id], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Retrieves replies from the database by its parent post.
+ * 
+ * @param {string} id The parent ID
+ * @returns {Reply[]} The replies data
+ */
+export function getReplyByParent(id) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM replies WHERE parent = ?;`, [id], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });

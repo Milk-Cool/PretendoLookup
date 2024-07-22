@@ -19,6 +19,7 @@ import {
     getContentByPID,
     getContentAll,
     getUserAll,
+    getReplyByParent
 } from "./index.js";
 
 const SERVICE = "Server";
@@ -37,7 +38,7 @@ const renderPost = (document, out) => {
             <h3><a href="/${typeof x.replies !== "undefined" ? "post" : "reply"}/${x.id}">${x.contents}</a></h3>
             <h5><a href="/user/${x.pid}">${x.pid}</a></h5>
             ${x.image ? `<img src="${x.image}">` : ""}
-            <h6>${typeof x.replies !== "undefined" ? `<a href="/replies/${x.id}">${x.replies + " replies"}</a>` : ""}</h6>
+            <h6>${typeof x.replies !== "undefined" ? `<a href="/resultsposts?type=parent&query=${x.id}">${x.replies + " replies"}</a>` : ""}</h6>
             <h6>${x.yeahs} yeahs</h6>
         </div>`
     }).join(""));
@@ -94,6 +95,7 @@ app.get("/resultsposts", async (req, res) => {
     else if(req.query.type == "community") out = await getContentByCommunity(req.query.query);
     else if(req.query.type == "keyword") out = await getContentByKeyword(req.query.query);
     else if(req.query.type == "hash") out = await getContentByImageHash(req.query.query);
+    else if(req.query.type == "parent") out = await getReplyByParent(req.query.query);
 
     document = renderPost(document, out);
     res.status(200).end(document);
