@@ -1,5 +1,5 @@
 * {
-    font: sans-serif;
+    font-family: sans-serif;
     color: white;
 }
 
@@ -65,12 +65,21 @@ body {
     height: calc(100vh - 4em - 2 * var(--pad-outer) - 2 * var(--pad));
     overflow: auto;
 }
+.submain {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column wrap;
+}
 .result {
-    width: min-content;
     height: min-content;
     display: inline-block;
-    margin: 1em;
-    min-width: 30em;
+    margin: var(--pad-outer);
+    flex: 1 auto;
+}
+@media only screen and (max-width: 768px) {
+    .result {
+        width: 100%;
+    }
 }
 .result > .img-container {
     text-align: center;
