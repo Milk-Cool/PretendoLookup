@@ -74,6 +74,20 @@ export function getPostByID(id) {
 }
 
 /**
+ * Retrieves 50 top posts.
+ * 
+ * @returns {Post[]} The posts data
+ */
+export function getPostsTop() {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts ORDER BY yeahs DESC LIMIT 50;`, [], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
  * Pushes a reply to the database.
  * 
  * @param {string} id The post ID

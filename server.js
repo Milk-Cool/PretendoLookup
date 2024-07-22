@@ -20,7 +20,8 @@ import {
     getContentByPID,
     getContentAll,
     getUserAll,
-    getReplyByParent
+    getReplyByParent,
+    getPostsTop
 } from "./index.js";
 
 const SERVICE = "Server";
@@ -32,10 +33,8 @@ const s = text => text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 const app = express();
 app.use(fileUpload({ "limits": { "fileSize": 10 * 1024 * 1024 } }));
 
-app.use(express.static("html"));
-
-const renderPost = (document, out) => {
-    return document.replaceAll("{{RESULTS}}", out.map(x => {
+const renderPost = (document, out, replace = "{{RESULTS") => {
+    return document.replaceAll(replace, out.map(x => {
         if(!x) return "";
         return `<div class="block result">
             <h3><a href="/${typeof x.replies !== "undefined" ? "post" : "reply"}/${x.id}">${s(x.contents) || "Post"}</a></h3>
@@ -198,6 +197,17 @@ app.post("/reversemiis", async (req, res) => {
     document = renderUser(document, all);
     res.status(200).end(document);
 });
+
+// Statistics
+app.get("/", async (_req, res) => {
+    let document = fs.readFileSync("html/index.html", "utf-8");
+
+    const top = await getPostsTop();
+    document = renderPost(document, top, "{{TOP_POSTS}}");
+    res.status(200).end(document);
+});
+
+app.use(express.static("html"));
 
 const port = 5012;
 app.listen(port, () => log(SERVICE, `Started @port ${port}`));
