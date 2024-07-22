@@ -27,6 +27,8 @@ const SERVICE = "Server";
 
 if(!process.env["DISABLE_WORKER"]) fork("./background.js");
 
+const s = text => text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
+
 const app = express();
 app.use(fileUpload({ "limits": { "fileSize": 10 * 1024 * 1024 } }));
 
@@ -36,7 +38,7 @@ const renderPost = (document, out) => {
     return document.replaceAll("{{RESULTS}}", out.map(x => {
         if(!x) return "";
         return `<div class="block result">
-            <h3><a href="/${typeof x.replies !== "undefined" ? "post" : "reply"}/${x.id}">${x.contents}</a></h3>
+            <h3><a href="/${typeof x.replies !== "undefined" ? "post" : "reply"}/${x.id}">${s(x.contents) || "Post"}</a></h3>
             <h5><a href="/user/${x.pid}">${x.pid}</a></h5>
             ${x.image ? `<img src="${x.image}">` : ""}
             <h6>${typeof x.replies !== "undefined" ? `<a href="/resultsposts?type=parent&query=${x.id}">${x.replies + " replies"}</a>` : ""}</h6>
@@ -50,7 +52,7 @@ const renderUser = (document, out) => {
         if(!x) return "";
         return `<div class="block result">
             <img src="https://pretendo-cdn.b-cdn.net/mii/${x.pid}/normal_face.png"><br>
-            <h2><a href="/user/${x.pid}">${x.name} @${x.pnid}</a></h2>
+            <h2><a href="/user/${x.pid}">${s(x.name)} @${s(x.pnid)}</a></h2>
         </div>`
     }).join(""));
 }
@@ -65,7 +67,7 @@ app.get("/user/:id", async (req, res) => {
     const mii = await fetchMiiData(req.params.id);
     document = document.replaceAll("{{USER}}", `
         <img src="https://pretendo-cdn.b-cdn.net/mii/${user.pid}/normal_face.png">
-        <h1>${user.name} @${user.pnid}</h1>
+        <h1>${s(user.name)} @${s(user.pnid)}</h1>
         <h2><a href="${genUrl("/users/" + user.pid)}" target="_blank">View on Juxt</a></h2>
         <h2><a href="/resultsposts?type=pid&query=${user.pid}">View posts</a></h2>
         ${mii.error ? "" : `
@@ -77,12 +79,34 @@ app.get("/user/:id", async (req, res) => {
             <li>Console MAC: ${mii.consoleMAC.toString("hex")}</li>
             <li>Is special: ${!mii.normalMii ? "Yes" : "No"}</li>
             <li>Is favorite: ${mii.favorite ? "Yes" : "No"}</li>
-            <li>Creator name: ${mii.creatorName}</li>
+            <li>Creator name: ${s(mii.creatorName)}</li>
             <li>Creation time: ${(new Date(Number(new Date("2010-01-01T00:00:00.000+00:00")) + mii.creationTime * 2000)).toGMTString()}</li>
             <li>Gender: ${mii.gender ? "Girl" : "Boy"}</li>
             <li>Birthday: ${mii.birthMonth}/${mii.birthDay}</li>
             </ul>
         `}
+    `);
+    res.status(200).end(document);
+});
+
+app.get("/post/:id", async (req, res) => {
+    if(!req.params.id) return res.status(400).end("bad-dest request");
+
+    let document = fs.readFileSync("html/post.html", "utf-8");
+
+    const post = await getPostByID(req.params.id);
+    if(!post) return res.status(404).end("not found at all!");
+    document = document.replaceAll("{{POST}}", `
+        <h2>${s(post.contents) || "Post"}</h2>
+        <h3>By ${post.pid}</h3>
+        ${post.image ? `<img src="${post.image}" width="600">` : "No image"}<br>
+        <i>${post.imagehash}</i><br>
+        <h4>${post.yeahs} yeahs, ${post.replies} replies</h4>
+
+        <h2><a href="/resultsposts?type=parent&query=${post.id}">View replies</a></h2>
+        <h2><a href="${genUrl("/posts/" + post.id)}" target="_blank">View on Juxt</a></h2>
+        <h2><a href="${genUrl("/users/" + post.pid)}" target="_blank">View user on Juxt</a></h2>
+        <h2><a href="${genUrl("/titles/" + post.community)}" target="_blank">View community on Juxt</a></h2>
     `);
     res.status(200).end(document);
 });
