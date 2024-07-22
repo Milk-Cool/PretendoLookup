@@ -178,6 +178,23 @@ export function getContentByImageHash(imghash) {
 }
 
 /**
+ * Retrieves all posts and replies.
+ * 
+ * @returns {Post | Reply} The content data
+ */
+export function getContentAll() {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts;`, [], (err, data) => {
+            if(err) reject(err);
+            db.all(`SELECT * FROM replies;`, [], (err2, data2) => {
+                if(err2) reject(err);
+                resolve(data.concat(data2));
+            });
+        });
+    });
+}
+
+/**
  * Pushes a community to the database.
  * 
  * @param {string} id The community ID
@@ -293,6 +310,20 @@ export function getUserByMiiHash(hash) {
     return new Promise((resolve, reject) => {
         db.all(`SELECT * FROM users WHERE miihash = ?
         LIMIT 250;`, [hash], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Retrieves all users from the database.
+ * 
+ * @returns {User} The user data
+ */
+export function getUserAll() {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM users;`, [], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });

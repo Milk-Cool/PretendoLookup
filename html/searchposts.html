@@ -33,9 +33,9 @@
                 <input type="submit">
             </form>
             <hr color="#383f6b">
-            <form action="/resultsposts" method="get">
-                <input hidden name="type" value="hash">
-                <input name="query" placeholder="Image JIMP hash (normal)">
+            <h3>Reverse image search</h3>
+            <form action="/reverseposts" method="post" encType="multipart/form-data">
+                <input type="file" name="file">
                 <input type="submit">
             </form>
         </div>

@@ -28,6 +28,7 @@
   "homepage": "https://github.com/Milk-Cool/PretendoLookup#readme",
   "dependencies": {
     "express": "^4.19.2",
+    "express-fileupload": "^1.5.1",
     "jimp": "^0.22.12",
     "jsdom": "^24.1.0",
     "puppeteer": "^22.13.1",
