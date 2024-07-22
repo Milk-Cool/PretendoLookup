@@ -97,7 +97,7 @@ app.get("/post/:id", async (req, res) => {
     if(!post) return res.status(404).end("not found at all!");
     document = document.replaceAll("{{POST}}", `
         <h2>${s(post.contents) || "Post"}</h2>
-        <h3>By ${post.pid}</h3>
+        <h3><a href="/user/${post.pid}">By ${post.pid}</a></h3>
         ${post.image ? `<img src="${post.image}" width="600">` : "No image"}<br>
         <i>${post.imagehash}</i><br>
         <h4>${post.yeahs} yeahs, ${post.replies} replies</h4>
