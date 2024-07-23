@@ -54,7 +54,8 @@ body {
     position: fixed;
     top: 50vh;
     left: 50vw;
-    max-height: 80vh;
+    max-height: 70vh;
+    overflow-y: auto;
     transform: translate(-50%, -50%);
 }
 .main {
