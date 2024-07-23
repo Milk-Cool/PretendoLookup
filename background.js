@@ -67,9 +67,9 @@ process.on("SIGINT", () => {
 process.on("SIGHUP", () => {
     db.close();
 });
-process.on("SIGKILL", () => {
-    db.close();
-});
+// process.on("SIGKILL", () => {
+//     db.close();
+// });
 
 (async () => { try {
     const browser = new HTMLBrowser();
