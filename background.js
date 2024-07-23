@@ -2,6 +2,7 @@ import {
     HTMLBrowser,
     dlog,
     log,
+    db,
     getCommunities,
     getPosts,
     getReplies,
@@ -59,6 +60,10 @@ const scanCommunity = async (browser, community) => {
     dlog(SERVICE, `Scanned community ${community.name}!`);
     return last;
 };
+
+process.on("SIGINT", () => {
+    db.close();
+});
 
 (async () => { try {
     const browser = new HTMLBrowser();
