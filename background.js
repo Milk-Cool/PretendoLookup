@@ -56,7 +56,7 @@ const scanCommunity = async (browser, community) => {
     }, id => {
         if(last == "") last = id;
     });
-    await updateCommunityLastID(community.id, last);
+    if(last != "") await updateCommunityLastID(community.id, last);
     dlog(SERVICE, `Scanned community ${community.name}!`);
     return last;
 };
