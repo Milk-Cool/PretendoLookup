@@ -64,6 +64,12 @@ const scanCommunity = async (browser, community) => {
 process.on("SIGINT", () => {
     db.close();
 });
+process.on("SIGHUP", () => {
+    db.close();
+});
+process.on("SIGKILL", () => {
+    db.close();
+});
 
 (async () => { try {
     const browser = new HTMLBrowser();
