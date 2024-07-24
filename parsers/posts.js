@@ -6,6 +6,35 @@ import { log } from "../log.js";
 const SERVICE = "POSTS";
 
 /**
+ * Creates post object data.
+ * 
+ * @param {HTMLElement} post The post element
+ * @returns {import("../storage.js").Post} The post
+ */
+const createPostObj = async post => {
+    const img = post.querySelector(".post-content > img");
+    let imgsrc = "", hash = "";
+    if(img) {
+        imgsrc = img.getAttribute("src");
+        const data = Buffer.from(await (await fetch(imgsrc)).arrayBuffer());
+        const imgj = await Jimp.read(data);
+        hash = await imgj.hash();
+    }
+
+    /** @type {import("../storage.js").Post} */
+    const postObj = {
+        "id": post.id,
+        "pid": parseInt(post.querySelector(".post-meta-wrapper > h3 > a").getAttribute("href").match(/(?<=\?pid=)\d+/)[0]),
+        "contents": post.querySelector(".post-content > h4")?.textContent ?? "",
+        "yeahs": parseInt(post.querySelector(".post-buttons-wrapper > span:nth-child(1) > h4").textContent),
+        "replies": parseInt(post.querySelector(".post-buttons-wrapper > span:nth-child(2) > h4").textContent),
+        "image": imgsrc,
+        "imagehash": hash
+    };
+    return postObj
+}
+
+/**
  * Gets and parses posts until lastPost.
  * 
  * @param {HTMLBrowser} browser The browser to use
@@ -42,25 +71,7 @@ export async function getPosts(browser, community, lastPost, cb, idcb) {
                 }
                 if(viewedPosts.includes(post.id)) continue;
 
-                const img = post.querySelector(".post-content > img");
-                let imgsrc = "", hash = "";
-                if(img) {
-                    imgsrc = img.getAttribute("src");
-                    const data = Buffer.from(await (await fetch(imgsrc)).arrayBuffer());
-                    const imgj = await Jimp.read(data);
-                    hash = await imgj.hash();
-                }
-
-                /** @type {import("../storage.js").Post} */
-                const postObj = {
-                    "id": post.id,
-                    "pid": parseInt(post.querySelector(".post-meta-wrapper > h3 > a").getAttribute("href").match(/(?<=\?pid=)\d+/)[0]),
-                    "contents": post.querySelector(".post-content > h4")?.textContent ?? "",
-                    "yeahs": parseInt(post.querySelector(".post-buttons-wrapper > span:nth-child(1) > h4").textContent),
-                    "replies": parseInt(post.querySelector(".post-buttons-wrapper > span:nth-child(2) > h4").textContent),
-                    "image": imgsrc,
-                    "imagehash": hash
-                };
+                const postObj = await createPostObj(post);
                 const r = cb(postObj);
                 if(r instanceof Promise) await r;
 
@@ -78,8 +89,9 @@ export async function getPosts(browser, community, lastPost, cb, idcb) {
  * @param {HTMLBrowser} browser The browser to use
  * @param {string} id The post ID
  * @param {(import("../storage.js").Reply) => void} cb The callback used for saving replies
+ * @param {((import("../storage.js").Post) => void)?} postcb The callback used for updating the post. null by dedfault
  */
-export async function getReplies(browser, id, cb) {
+export async function getReplies(browser, id, cb, postcb = null) {
     const page = await browser.createPage();
     const content = await get(page, `/posts/${id}`);
     await page.close();
@@ -88,6 +100,14 @@ export async function getReplies(browser, id, cb) {
 
     const parent = document.querySelector("#wrapper > .posts-wrapper:nth-child(1)");
     const parentID = parent.id;
+
+    if(postcb) {
+        try {
+            const postObj = await createPostObj(document.querySelector("#wrapper > .posts-wrapper:nth-child(1)"));
+            const r = postcb(postObj);
+            if(r instanceof Promise) await r;
+        } catch(e) { log(SERVICE, `Internal error while parsing a post with replies: ${e}\n${e.stack}`, "error"); }
+    }
 
     for(const reply of document.querySelectorAll("#wrapper > .posts-wrapper:nth-child(n+2)")) {
         try {

@@ -13,7 +13,11 @@ import {
     updateCommunityLastID,
     getUserData,
     pushUser,
-    getUserByID
+    getUserByID,
+    updatePost,
+    updateReply,
+    getReplyByID,
+    updateUser
 } from "./index.js";
 
 const SERVICE = "Worker";
@@ -71,9 +75,39 @@ process.on("SIGHUP", () => {
 //     db.close();
 // });
 
+/** @type {HTMLBrowser} */
+const browser = new HTMLBrowser();
+let ready = false;
+
+process.on("message", async msg_ => {
+    if(!ready) return;
+    /** @type {Message} */
+    const msg = msg_; // For type checking
+    switch(msg.type) {
+        case "post":
+        case "reply":
+            const id = msg.type == "reply"
+                ? (await getReplyByID(msg.id)).parent
+                : msg.id;
+            getReplies(browser, id, async reply => {
+                await updateReply(reply.id, reply.pid, reply.parent,
+                    reply.contents, reply.yeahs, reply.image, reply.imagehash);
+            }, async post => {
+                await updatePost(post.id, post.pid, post.community, post.contents,
+                    post.yeahs, post.replies, post.image, post.imagehash);
+            });
+            break;
+        case "user":
+            getUserData(browser, msg.id, async user => {
+                await updateUser(user.pid, user.pnid, user.name, user.miihash);
+            });
+            break;
+    }
+});
+
 (async () => { try {
-    const browser = new HTMLBrowser();
     await browser.make();
+    ready = true;
 
     /** @type {import("./storage.js").Community[]} */
     const communities = [];

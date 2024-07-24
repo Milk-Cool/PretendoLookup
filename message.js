@@ -1,0 +1,1 @@
+/** @typedef {{ type: "post" | "reply" | "user", "id": string }} Message */

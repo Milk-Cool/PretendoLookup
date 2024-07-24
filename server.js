@@ -1,4 +1,4 @@
-import { fork } from "child_process";
+import { ChildProcess, fork } from "child_process";
 import express from "express";
 import fileUpload from "express-fileupload";
 import fs from "fs";
@@ -21,12 +21,14 @@ import {
     getContentAll,
     getUserAll,
     getReplyByParent,
-    getPostsTop
+    getPostsTop,
 } from "./index.js";
 
 const SERVICE = "Server";
 
-if(!process.env["DISABLE_WORKER"]) fork("./background.js");
+/** @type {ChildProcess | null} */
+let worker = null;
+if(!process.env["DISABLE_WORKER"]) worker = fork("./background.js");
 
 const s = text => text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 
@@ -63,6 +65,12 @@ app.get("/user/:id", async (req, res) => {
 
     const user = await getUserByID(req.params.id);
     if(!user) return res.status(404).end("not found!");
+    // updating in background
+    if(worker !== null) {
+        /** @type {Message} */
+        const msg = { "type": "user", "id": user.pid };
+        worker.send(msg);
+    }
     const mii = await fetchMiiData(req.params.id);
     document = document.replaceAll("{{USER}}", `
         <img src="https://pretendo-cdn.b-cdn.net/mii/${user.pid}/normal_face.png">
@@ -95,6 +103,12 @@ app.get("/post/:id", async (req, res) => {
 
     const post = await getPostByID(req.params.id);
     if(!post) return res.status(404).end("not found at all!");
+    // updating in background
+    if(worker !== null) {
+        /** @type {Message} */
+        const msg = { "type": "post", "id": post.id };
+        worker.send(msg);
+    }
     document = document.replaceAll("{{POST}}", `
         <h2>${s(post.contents) || "Post"}</h2>
         <h3><a href="/user/${post.pid}">By ${post.pid}</a></h3>
@@ -117,6 +131,12 @@ app.get("/reply/:id", async (req, res) => {
 
     const reply = await getReplyByID(req.params.id);
     if(!reply) return res.status(404).end("not found unofrtunately :(");
+    // updating in background
+    if(worker !== null) {
+        /** @type {Message} */
+        const msg = { "type": "reply", "id": reply.id };
+        worker.send(msg);
+    }
     document = document.replaceAll("{{REPLY}}", `
         <h2>${s(reply.contents) || "Post"}</h2>
         <h3>By ${reply.pid}</h3>

@@ -59,6 +59,33 @@ export function pushPost(id, pid, community, contents, yeahs, replies, image = "
 }
 
 /**
+ * Updates post data in the database.
+ * 
+ * @param {string} id The post ID
+ * @param {number} pid The user's PID
+ * @param {string} community The community ID
+ * @param {string} contents The post text contents
+ * @param {number} yeahs The number of Yeah's
+ * @param {number} replies The number of replies
+ * @param {string?} image The image URL
+ * @param {string?} imagehash The JIMP image hash
+ */
+export function updatePost(id, pid, community, contents, yeahs, replies, image = "", imagehash = "") {
+    return new Promise(async resolve => {
+        if(!(await getPostByID(id))) return resolve(null);
+        db.run(`UPDATE posts
+            SET pid = ?,
+            community = ?,
+            contents = ?,
+            yeahs = ?,
+            replies = ?,
+            image = ?,
+            imagehash = ?
+            WHERE id = ?;`, [pid, community, contents, yeahs, replies, image, imagehash, id], resolve);
+    });
+}
+
+/**
  * Retrieves a post from the database by its ID.
  * 
  * @param {string} id The post ID
@@ -103,6 +130,31 @@ export function pushReply(id, pid, parent, contents, yeahs, image = "", imagehas
         if(await getReplyByID(id)) return resolve(null);
         db.run(`INSERT INTO replies (id, pid, parent, contents, yeahs, image, imagehash)
             VALUES (?, ?, ?, ?, ?, ?, ?);`, [id, pid, parent, contents, yeahs, image, imagehash], resolve);
+    });
+}
+
+/**
+ * Updates reply data in the database.
+ * 
+ * @param {string} id The post ID
+ * @param {number} pid The user's PID
+ * @param {string} parent The parent post ID
+ * @param {string} contents The post text contents
+ * @param {number} yeahs The number of Yeah's
+ * @param {string?} image The image URL
+ * @param {string?} imagehash The JIMP image hash
+ */
+export function updateReply(id, pid, parent, contents, yeahs, image = "", imagehash = "") {
+    return new Promise(async resolve => {
+        if(!(await getReplyByID(id))) return resolve(null);
+        db.run(`UPDATE replies
+            SET pid = ?,
+            parent = ?,
+            contents = ?,
+            yeahs = ?,
+            image = ?,
+            imagehash = ?
+            WHERE id = ?;`, [pid, parent, contents, yeahs, image, imagehash, id], resolve);
     });
 }
 
@@ -279,6 +331,25 @@ export function pushUser(pid, pnid, name, miihash) {
     return new Promise(resolve => {
         db.run(`INSERT INTO users (pid, pnid, name, miihash)
             VALUES (?, ?, ?, ?);`, [pid, pnid, name, miihash], resolve);
+    });
+}
+
+/**
+ * Updates user data in the database.
+ * 
+ * @param {number} pid The user PID
+ * @param {string} pnid The user PNID
+ * @param {string} name The user's name
+ * @param {string} miihash The user's Mii JIMP hash
+ */
+export function updateUser(pid, pnid, name, miihash) {
+    return new Promise(async resolve => {
+        if(!(await getUserByID(pid))) return resolve(null);
+        db.run(`UPDATE users
+            SET pnid = ?,
+            name = ?,
+            miihash = ?
+            WHERE pid = ?;`, [pnid, name, miihash, pid], resolve);
     });
 }
 
