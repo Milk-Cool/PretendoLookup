@@ -218,6 +218,24 @@ app.post("/reversemiis", async (req, res) => {
     res.status(200).end(document);
 });
 
+// TODO: move to another file when done
+// API
+app.post("/api/reverse/posts", async (req, res) => {
+    if(!req.files || !req.files.file) return res.status(400).end("NEW BAD REQUEST UPDATE");
+
+    /** @type {Jimp} */
+    let img;
+    try { img = await Jimp.read(req.files.file.data); } catch(_) { return res.status(400).end("not not bad"); }
+    const hash = img.hash();
+
+    const all = (await getContentAll()).map(x => {
+        x.imagedist = x.image ? Jimp.compareHashes(x.imagehash, hash) : 1;
+        return x;
+    }).sort((a, b) => a.imagedist - b.imagedist).slice(0, 50);
+
+    res.status(200).contentType("application/json").end(JSON.stringify(all));
+})
+
 // Statistics
 app.get("/", async (_req, res) => {
     let document = fs.readFileSync("html/index.html", "utf-8");
