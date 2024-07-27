@@ -199,7 +199,7 @@ export function getContentByPID(pid) {
         db.all(`SELECT * FROM posts WHERE pid = ? LIMIT 50;`, [pid], (err, data) => {
             if(err) reject(err);
             db.all(`SELECT * FROM replies WHERE pid = ? LIMIT 50;`, [pid], (err2, data2) => {
-                if(err2) reject(err);
+                if(err2) reject(err2);
                 resolve(data.concat(data2));
             });
         });
@@ -233,7 +233,7 @@ export function getContentByKeyword(keyword) {
         db.all(`SELECT * FROM posts WHERE instr(lower(contents), lower(?)) LIMIT 50;`, [keyword], (err, data) => {
             if(err) reject(err);
             db.all(`SELECT * FROM replies WHERE instr(lower(contents), lower(?)) LIMIT 50;`, [keyword], (err2, data2) => {
-                if(err2) reject(err);
+                if(err2) reject(err2);
                 resolve(data.concat(data2));
             });
         });
@@ -251,7 +251,7 @@ export function getContentByImageHash(imghash) {
         db.all(`SELECT * FROM posts WHERE imagehash = ? LIMIT 50;`, [imghash], (err, data) => {
             if(err) reject(err);
             db.all(`SELECT * FROM replies WHERE imagehash = ? LIMIT 50;`, [imghash], (err2, data2) => {
-                if(err2) reject(err);
+                if(err2) reject(err2);
                 resolve(data.concat(data2));
             });
         });
@@ -268,8 +268,25 @@ export function getContentAll() {
         db.all(`SELECT * FROM posts;`, [], (err, data) => {
             if(err) reject(err);
             db.all(`SELECT * FROM replies;`, [], (err2, data2) => {
-                if(err2) reject(err);
+                if(err2) reject(err2);
                 resolve(data.concat(data2));
+            });
+        });
+    });
+}
+/**
+ * Retrieves all posts and replies yeahs sum by user.
+ * 
+ * @param {number} pid User PID
+ * @returns {Post | Reply} The content data
+ */
+export function getPretendollars(pid) {
+    return new Promise((resolve, reject) => {
+        db.get(`SELECT sum(yeahs) AS sum_yeahs FROM posts WHERE pid = ?;`, [pid], (err, data) => {
+            if(err) reject(err);
+            db.get(`SELECT sum(yeahs) AS sum_yeahs FROM replies WHERE pid = ?;`, [pid], (err2, data2) => {
+                if(err2) reject(err2);
+                resolve(data.sum_yeahs + data2.sum_yeahs);
             });
         });
     });

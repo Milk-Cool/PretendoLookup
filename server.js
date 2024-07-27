@@ -22,6 +22,7 @@ import {
     getUserAll,
     getReplyByParent,
     getPostsTop,
+    getPretendollars,
 } from "./index.js";
 
 const SERVICE = "Server";
@@ -71,12 +72,14 @@ app.get("/user/:id", async (req, res) => {
         const msg = { "type": "user", "id": user.pid };
         worker.send(msg);
     }
+    const pretendollars = await getPretendollars(user.pid);
     const mii = await fetchMiiData(req.params.id);
     document = document.replaceAll("{{USER}}", `
         <img src="https://pretendo-cdn.b-cdn.net/mii/${user.pid}/normal_face.png">
         <h1>${s(user.name)} @${s(user.pnid)}</h1>
         <h2><a href="${genUrl("/users/" + user.pid)}" target="_blank">View on Juxt</a></h2>
         <h2><a href="/resultsposts?type=pid&query=${user.pid}">View posts</a></h2>
+        <h3>P$: ${pretendollars}</h3>
         ${mii.error ? "" : `
             <h3>Mii info:</h3>
             <ul>
@@ -234,7 +237,12 @@ app.post("/api/reverse/posts", async (req, res) => {
     }).sort((a, b) => a.imagedist - b.imagedist).slice(0, 50);
 
     res.status(200).contentType("application/json").end(JSON.stringify(all));
-})
+});
+app.get("/api/pretendollars/:id", async (req, res) => {
+    if(!(await getUserByID(req.params.id))) return res.status(404).end("NOT FOUND MENTIONED");
+    const pretendollars = await getPretendollars(req.params.id);
+    res.status(200).end(pretendollars.toString());
+});
 
 // Statistics
 app.get("/", async (_req, res) => {
