@@ -65,21 +65,20 @@ app.get("/user/:id", async (req, res) => {
     let document = fs.readFileSync("html/user.html", "utf-8");
 
     const user = await getUserByID(req.params.id);
-    if(!user) return res.status(404).end("not found!");
     // updating in background
-    if(worker !== null) {
+    if(user && worker !== null) {
         /** @type {Message} */
         const msg = { "type": "user", "id": user.pid };
         worker.send(msg);
     }
-    const pretendollars = await getPretendollars(user.pid);
+    const pretendollars = user && await getPretendollars(user.pid);
     const mii = await fetchMiiData(req.params.id);
     document = document.replaceAll("{{USER}}", `
-        <img src="https://pretendo-cdn.b-cdn.net/mii/${user.pid}/normal_face.png">
-        <h1>${s(user.name)} @${s(user.pnid)}</h1>
+        <img src="https://pretendo-cdn.b-cdn.net/mii/${req.params.id}/normal_face.png">
+        ${(user && `<h1>${s(user.name)} @${s(user.pnid)}</h1>
         <h2><a href="${genUrl("/users/" + user.pid)}" target="_blank">View on Juxt</a></h2>
         <h2><a href="/resultsposts?type=pid&query=${user.pid}">View posts</a></h2>
-        <h3>P$: ${pretendollars}</h3>
+        <h3>P$: ${pretendollars}</h3>`) ?? ""}
         ${mii.error ? "" : `
             <h3>Mii info:</h3>
             <ul>
