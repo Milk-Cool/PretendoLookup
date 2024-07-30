@@ -207,6 +207,24 @@ export function getContentByPID(pid) {
 }
 
 /**
+ * Retrieves posts and replies from the database by its author PID (no limit).
+ * 
+ * @param {number} pid The author PID
+ * @returns {Post | Reply} The content data
+ */
+export function getContentByPIDUnlimited(pid) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts WHERE pid = ?;`, [pid], (err, data) => {
+            if(err) reject(err);
+            db.all(`SELECT * FROM replies WHERE pid = ?;`, [pid], (err2, data2) => {
+                if(err2) reject(err2);
+                resolve(data.concat(data2));
+            });
+        });
+    });
+}
+
+/**
  * Retrieves posts and replies from the database by its community PID.
  * TODO: also return replies
  * 

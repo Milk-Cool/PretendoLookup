@@ -23,6 +23,7 @@ import {
     getReplyByParent,
     getPostsTop,
     getPretendollars,
+    getContentByPIDUnlimited
 } from "./index.js";
 
 const SERVICE = "Server";
@@ -78,6 +79,7 @@ app.get("/user/:id", async (req, res) => {
         ${(user && `<h1>${s(user.name)} @${s(user.pnid)}</h1>
         <h2><a href="${genUrl("/users/" + user.pid)}" target="_blank">View on Juxt</a></h2>
         <h2><a href="/resultsposts?type=pid&query=${user.pid}">View posts</a></h2>
+        <h2><a href="javascript:void(0)" onclick="fetch('/api/update/user/${user.pid}').then(x => x.text()).then(alert)">Refresh post data</a></h2>
         <h3>P$: ${pretendollars}</h3>`) ?? ""}
         ${mii.error ? "" : `
             <h3>Mii info:</h3>
@@ -241,6 +243,16 @@ app.get("/api/pretendollars/:id", async (req, res) => {
     if(!(await getUserByID(req.params.id))) return res.status(404).end("NOT FOUND MENTIONED");
     const pretendollars = await getPretendollars(req.params.id);
     res.status(200).end(pretendollars.toString());
+});
+app.get("/api/update/user/:pid", async (req, res) => {
+    if(!(await getUserByID(req.params.pid))) return res.status(404).end("not found :skull:");
+    const content = await getContentByPIDUnlimited(req.params.pid);
+    if(worker !== null)
+        for(const i of content) {
+            const msg = { "type": i.parent ? "reply" : "post", "id": i.id };
+            worker.send(msg);
+        }
+    res.status("200").send("Updating in background! Check back later :)");
 });
 
 // Statistics
