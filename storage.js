@@ -196,9 +196,9 @@ export function getReplyByParent(id) {
  */
 export function getContentByPID(pid) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM posts WHERE pid = ? LIMIT 50;`, [pid], (err, data) => {
+        db.all(`SELECT * FROM posts WHERE pid = ? LIMIT 500;`, [pid], (err, data) => {
             if(err) reject(err);
-            db.all(`SELECT * FROM replies WHERE pid = ? LIMIT 50;`, [pid], (err2, data2) => {
+            db.all(`SELECT * FROM replies WHERE pid = ? LIMIT 500;`, [pid], (err2, data2) => {
                 if(err2) reject(err2);
                 resolve(data.concat(data2));
             });
@@ -233,7 +233,7 @@ export function getContentByPIDUnlimited(pid) {
  */
 export function getContentByCommunity(id) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM posts WHERE community = ? LIMIT 50;`, [id], (err, data) => {
+        db.all(`SELECT * FROM posts WHERE community = ? LIMIT 500;`, [id], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });
@@ -248,9 +248,9 @@ export function getContentByCommunity(id) {
  */
 export function getContentByKeyword(keyword) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM posts WHERE instr(lower(contents), lower(?)) LIMIT 50;`, [keyword], (err, data) => {
+        db.all(`SELECT * FROM posts WHERE instr(lower(contents), lower(?)) LIMIT 500;`, [keyword], (err, data) => {
             if(err) reject(err);
-            db.all(`SELECT * FROM replies WHERE instr(lower(contents), lower(?)) LIMIT 50;`, [keyword], (err2, data2) => {
+            db.all(`SELECT * FROM replies WHERE instr(lower(contents), lower(?)) LIMIT 500;`, [keyword], (err2, data2) => {
                 if(err2) reject(err2);
                 resolve(data.concat(data2));
             });
@@ -266,9 +266,9 @@ export function getContentByKeyword(keyword) {
  */
 export function getContentByImageHash(imghash) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM posts WHERE imagehash = ? LIMIT 50;`, [imghash], (err, data) => {
+        db.all(`SELECT * FROM posts WHERE imagehash = ? LIMIT 500;`, [imghash], (err, data) => {
             if(err) reject(err);
-            db.all(`SELECT * FROM replies WHERE imagehash = ? LIMIT 50;`, [imghash], (err2, data2) => {
+            db.all(`SELECT * FROM replies WHERE imagehash = ? LIMIT 500;`, [imghash], (err2, data2) => {
                 if(err2) reject(err2);
                 resolve(data.concat(data2));
             });
@@ -412,7 +412,7 @@ export function getUserByID(pid) {
 export function getUserByPNID(pnid) {
     return new Promise((resolve, reject) => {
         db.all(`SELECT * FROM users WHERE instr(lower(pnid), lower(?)) > 0
-            ORDER BY length(pnid) LIMIT 50;`, [pnid], (err, data) => {
+            ORDER BY length(pnid) LIMIT 500;`, [pnid], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });
@@ -428,7 +428,7 @@ export function getUserByPNID(pnid) {
 export function getUserByName(name) {
     return new Promise((resolve, reject) => {
         db.all(`SELECT * FROM users WHERE instr(lower(name), lower(?)) > 0
-            ORDER BY length(name) LIMIT 50;`, [name], (err, data) => {
+            ORDER BY length(name) LIMIT 500;`, [name], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });
@@ -444,7 +444,7 @@ export function getUserByName(name) {
 export function getUserByMiiHash(hash) {
     return new Promise((resolve, reject) => {
         db.all(`SELECT * FROM users WHERE miihash = ?
-        LIMIT 250;`, [hash], (err, data) => {
+        LIMIT 500;`, [hash], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });
