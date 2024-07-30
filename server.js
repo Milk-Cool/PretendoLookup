@@ -252,7 +252,7 @@ app.get("/api/update/user/:pid", async (req, res) => {
             const msg = { "type": i.parent ? "reply" : "post", "id": i.id };
             worker.send(msg);
         }
-    res.status("200").send("Updating in background! Check back later :)");
+    res.status(200).send("Updating in background! Check back later :)");
 });
 
 // Statistics
