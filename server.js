@@ -247,10 +247,11 @@ app.get("/api/pretendollars/:id", async (req, res) => {
 app.get("/api/update/user/:pid", async (req, res) => {
     if(!(await getUserByID(req.params.pid))) return res.status(404).end("not found :skull:");
     const content = await getContentByPIDUnlimited(req.params.pid);
+    let n = 0;
     if(worker !== null)
         for(const i of content) {
             const msg = { "type": i.parent ? "reply" : "post", "id": i.id };
-            worker.send(msg);
+            setTimeout(() => worker.send(msg), 1500 * (n++));
         }
     res.status(200).send("Updating in background! Check back later :)");
 });
