@@ -15,10 +15,12 @@ const createPostObj = async post => {
     const img = post.querySelector(".post-content > img");
     let imgsrc = "", hash = "";
     if(img) {
-        imgsrc = img.getAttribute("src");
-        const data = Buffer.from(await (await fetch(imgsrc)).arrayBuffer());
-        const imgj = await Jimp.read(data);
-        hash = await imgj.hash();
+        try {
+            imgsrc = img.getAttribute("src");
+            const data = Buffer.from(await (await fetch(imgsrc)).arrayBuffer());
+            const imgj = await Jimp.read(data);
+            hash = await imgj.hash();
+        } catch(_) { let imgsrc = "", hash = ""; }
     }
 
     /** @type {import("../storage.js").Post} */
@@ -114,10 +116,12 @@ export async function getReplies(browser, id, cb, postcb = null) {
             const img = reply.querySelector(".post-content > img");
             let imgsrc = "", hash = "";
             if(img) {
-                imgsrc = img.getAttribute("src");
-                const data = Buffer.from(await (await fetch(imgsrc)).arrayBuffer());
-                const imgj = await Jimp.read(data);
-                hash = await imgj.hash();
+                try {
+                    imgsrc = img.getAttribute("src");
+                    const data = Buffer.from(await (await fetch(imgsrc)).arrayBuffer());
+                    const imgj = await Jimp.read(data);
+                    hash = await imgj.hash();
+                } catch(_) { let imgsrc = "", hash = ""; }
             }
 
             /** @type {import("../storage.js").Reply} */
