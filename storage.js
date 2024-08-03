@@ -37,6 +37,10 @@ db.run(`CREATE TABLE IF NOT EXISTS replies (
     image TEXT,
     imagehash TEXT
 );`);
+/** @typedef {{id: string }} ReportedPost */
+db.run(`CREATE TABLE IF NOT EXISTS reported (
+    id TEXT
+);`);
 
 /**
  * Pushes a post to the database.
@@ -459,6 +463,48 @@ export function getUserByMiiHash(hash) {
 export function getUserAll() {
     return new Promise((resolve, reject) => {
         db.all(`SELECT * FROM users;`, [], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Pushes a reported post to the database.
+ * 
+ * @param {string} id The post ID
+ */
+export function pushReportedPost(id) {
+    return new Promise(async resolve => {
+        if(await getReportedPostByID(id)) return resolve(null);
+        db.run(`INSERT INTO reported (id)
+            VALUES (?);`, [id], resolve);
+    });
+}
+
+/**
+ * Retrieves a reported post from the database by its ID.
+ * 
+ * @param {string} id The post ID
+ * @returns {ReportedPost} The post data
+ */
+export function getReportedPostByID(id) {
+    return new Promise((resolve, reject) => {
+        db.get(`SELECT * FROM reported WHERE id = ?;`, [id], (err, data) => {
+            if(err) reject(err);
+            resolve(data);
+        });
+    });
+}
+
+/**
+ * Retrieves 500 reported posts.
+ * 
+ * @returns {ReportedPost[]} The post data
+ */
+export function getReportedPosts() {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM reported LIMIT 500;`, [], (err, data) => {
             if(err) reject(err);
             resolve(data);
         });

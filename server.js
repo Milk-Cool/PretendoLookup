@@ -23,10 +23,18 @@ import {
     getReplyByParent,
     getPostsTop,
     getPretendollars,
-    getContentByPIDUnlimited
+    getContentByPIDUnlimited,
+    getReportedPosts,
+    pushReportedPost
 } from "./index.js";
 
 const SERVICE = "Server";
+
+/** @type {Record<string, Date>} */
+const lastDelReq = {};
+/** @type {number} */
+const interval = 15 * 60 * 1000; // 15 minutes
+const intervalText = "15 minutes";
 
 /** @type {ChildProcess | null} */
 let worker = null;
@@ -125,6 +133,7 @@ app.get("/post/:id", async (req, res) => {
         <h2><a href="${genUrl("/posts/" + post.id)}" target="_blank">View on Juxt</a></h2>
         <h2><a href="${genUrl("/users/" + post.pid)}" target="_blank">View user on Juxt</a></h2>
         <h2><a href="${genUrl("/titles/" + post.community)}" target="_blank">View community on Juxt</a></h2>
+        <h4><a href="javascript:void(0)" onclick="confirm('Are you sure?') && fetch('/api/request/post/${post.id}').then(x => x.text()).then(alert)">Request deletion</a></h4>
     `);
     res.status(200).end(document);
 });
@@ -226,6 +235,15 @@ app.post("/reversemiis", async (req, res) => {
     res.status(200).end(document);
 });
 
+app.get("/reported", async (req, res) => {
+    let reported = await getReportedPosts();
+    reported = await Promise.all(reported.map(async x => await getPostByID(x.id)));
+    
+    let document = fs.readFileSync("html/reported.html", "utf-8");
+    document = renderPost(document, reported, "{{REPORTED}}");
+    res.status(200).end(document);
+});
+
 // TODO: move to another file when done
 // API
 app.post("/api/reverse/posts", async (req, res) => {
@@ -258,6 +276,14 @@ app.get("/api/update/user/:pid", async (req, res) => {
             setTimeout(() => worker.send(msg), 1500 * (n++));
         }
     res.status(200).send("Updating in background! Check back later :)");
+});
+app.get("/api/request/post/:id", async (req, res) => {
+    if(!(req.ip in lastDelReq))
+        lastDelReq[req.ip] = new Date();
+    else if(new Date() - lastDelReq[req.ip] < interval)
+        return res.status(429).end(`You can only request deletion every ${intervalText}!`);
+    await pushReportedPost(req.params.id);
+    res.status(200).end("Deletion requested!");
 });
 
 // Statistics
