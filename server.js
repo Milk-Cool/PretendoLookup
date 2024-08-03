@@ -166,6 +166,9 @@ app.get("/resultsusers", async (req, res) => {
     else if(req.query.type == "name") out = await getUserByName(req.query.query);
     else if(req.query.type == "hash") out = await getUserByMiiHash(req.query.query);
 
+    if(req.query.type == "pid" && out.filter(Boolean).length == 0)
+        return res.redirect("/user/" + req.query.query);
+
     document = renderUser(document, out);
     res.status(200).end(document);
 });
