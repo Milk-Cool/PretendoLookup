@@ -84,6 +84,7 @@ app.get("/user/:id", async (req, res) => {
         ${mii.error ? "" : `
             <h3>Mii info:</h3>
             <ul>
+            <li>Name: ${mii.miiName}</li>
             <li>${mii.version == 3 ? "Made from scratch" : "Made from a photo"}</li>
             <li>Made on ${["Wii", "DS", "3DS", "Wii U"][mii.deviceOrigin - 1]}</li>
             <li>Console ID: ${mii.systemId.toString("hex")}</li>
