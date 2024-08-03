@@ -25,7 +25,8 @@ import {
     getPretendollars,
     getContentByPIDUnlimited,
     getReportedPosts,
-    pushReportedPost
+    pushReportedPost,
+    getLastPostByPID
 } from "./index.js";
 
 const SERVICE = "Server";
@@ -284,6 +285,12 @@ app.get("/api/request/post/:id", async (req, res) => {
         return res.status(429).end(`You can only request deletion every ${intervalText}!`);
     await pushReportedPost(req.params.id);
     res.status(200).end("Deletion requested!");
+});
+// For Pinder
+app.get("/api/latestpost/:pid", async (req, res) => {
+    const post = await getLastPostByPID(req.params.pid);
+    if(!post) return res.status(404).end("not found smhh");
+    res.status(200).end(post.contents);
 });
 
 // Statistics

@@ -105,6 +105,22 @@ export function getPostByID(id) {
 }
 
 /**
+ * Retrieves the last post from the database by author PID.
+ * 
+ * @param {string} pid The author PID
+ * @returns {Post} The post data
+ */
+export function getLastPostByPID(pid) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM posts WHERE pid = ?;`, [pid], (err, data) => {
+            if(err) reject(err);
+            if(!data) return resolve(null);
+            resolve(data[data.length - 1]);
+        });
+    });
+}
+
+/**
  * Retrieves 50 top posts.
  * 
  * @returns {Post[]} The posts data
