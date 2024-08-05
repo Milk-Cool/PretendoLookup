@@ -8,6 +8,7 @@ import {
     log,
     genUrl,
     fetchMiiData,
+    fetchPID,
     getUserByID,
     getUserByName,
     getUserByPNID,
@@ -179,6 +180,9 @@ app.get("/resultsusers", async (req, res) => {
 
     if(req.query.type == "pid" && out.filter(Boolean).length == 0)
         return res.redirect("/user/" + req.query.query);
+    else if(req.query.type == "pnid" && out.filter(Boolean).length == 0) {
+        return res.redirect("/user/" + await fetchPID(req.query.query));
+    }
 
     document = renderUser(document, out);
     res.status(200).end(document);
